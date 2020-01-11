@@ -1,11 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
-// FIXME: Constructor currently public, i.e. not a singleton
 /*
  * Defines the Game class used to run a game of life simulation.
- * The game class is implemented in the Singleton design pattern so
- * that only a single instance of the game can be instantiated.
  */
 
 #include <iostream>
@@ -29,13 +26,18 @@ class Game
         void kill_cell(std::map<std::pair<const int, const int>, Cell*>::iterator);
         void play_round();
         void find_new_life();
-        void print_cell_map();
+        //void update_cell_grid();
+
+        /*----FUNCTIONS TO REMOVE----*/
+        void print_cell_map(); // TODO: Delete after numpy integration successful
 
     public:
         Game(const int rows, const int cols, const int starting_cells, const int max_iter = -1);
         ~Game();
         void run_game();
-        void print_game_info();
+
+        /*----FUNCTIONS TO REMOVE----*/
+        void print_game_info(); // TODO: Delete after numpy integration successful
        
 };
 
