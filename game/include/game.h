@@ -6,6 +6,7 @@
 #include <python3.7m/Python.h>
 #include <iostream>
 #include <cstdio>
+#include <vector>
 #include <map>
 #include "cell.h"
 
@@ -21,7 +22,6 @@ class Game
         void update_cell_neighbors(Cell*);
         void create_live_cell(const int, const int);
         void kill_cell(std::map<std::pair<const int, const int>, Cell*>::iterator);
-        void play_round();
         void find_new_life();
 
         // FUNCTIONS TO REMOVE
@@ -30,7 +30,7 @@ class Game
     public:
         Game(const int, const int, const int, const int max_iter = -1, const int random_seed = -1);
         ~Game();
-        void run_game();
+        void play_round();
         PyObject* get_list();
         void print_game_info();
 };

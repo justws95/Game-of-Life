@@ -153,22 +153,28 @@ void Game::kill_cell(std::map<std::pair<const int, const int>, Cell*>::iterator 
 // Function to run a single round of the game of life, according to the rules that Conway proposed
 void Game::play_round()
 {
-    std::map<std::pair<const int, const int>, Cell*>::iterator it, it2;
+    std::map<std::pair<const int, const int>, Cell*>::iterator it;
+    std::vector<std::map<std::pair<const int, const int>, Cell*>::iterator> cells_to_kill;
 
     // Kill cells from under/over population
-    for(it = this->living_cells.begin(); it != this->living_cells.end();)
+    for(it = this->living_cells.begin(); it != this->living_cells.end(); it++)
     {
-
-        it2 = it++;
-
-        if(it2->second->num_neighbors < 2 || it2->second->num_neighbors > 3)
+        if(it->second->num_neighbors < 2 || it->second->num_neighbors > 3)
         {
-            this->kill_cell(it2);
+            cells_to_kill.push_back(it);
         }
     }
 
     // Create live cells from dead cells with 3 live neighbors
     this->find_new_life();
+
+    // Kill all the cells in the vector to be killed
+    for(int n = 0; n < cells_to_kill.size(); n++)
+    {
+        this->kill_cell(cells_to_kill[n]);
+    }
+
+    cells_to_kill.clear();
 
     // Update the neighbors for each cell
     for(it = this->living_cells.begin(); it != this->living_cells.end(); it++)
@@ -225,23 +231,6 @@ void Game::find_new_life()
                 this->create_live_cell(i, j);
             }
         }
-    }
-}
-
-
-// Handler to run the game simulation
-void Game::run_game()
-{
-    if(this->limit_iter)
-    {
-        for(int n = 0; n < this->max_iter; n++)
-        {
-            this->play_round();
-        }
-    }
-    else
-    {
-        fprintf(stderr, "Error: Functionalty not yet implemented\n");
     }
 }
 
