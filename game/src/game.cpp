@@ -1,30 +1,26 @@
+/*---Implements the methods of the Game class.---*/
 #include "game.h"
 
-/*
- * Implements the methods of the Game class.
- */
 
-
-// Constructor
-Game::Game(const int rows, const int cols, const int starting_cells, const int max_iter)
+Game::Game(const int rows, const int cols, const int starting_cells, const int max_iter, const int random_seed)
 {
-    this->set_random_seed(-1); //FIXME: Allow adjustable random state seed, add field to params maybe?
     this->rows = rows;
     this->cols = cols;
     this->starting_cells = starting_cells;
     this->max_iter = max_iter;
     this->active_game = false;
 
-    if(this->max_iter != -1)
-    {
-        this->limit_iter = true;
-    }
+    // Set iteration limit if specified
+    max_iter == -1 ? this->limit_iter = false : this->limit_iter = true;
 
+    // Set the random seed if specified
+    random_seed == -1 ? srand(time(NULL)) : srand(random_seed);
+
+    // Create initial cells at random    
     this->create_initial_cells();
 }
 
 
-// Destructor 
 //TODO: See if destructor can leverage kill_cell() method
 Game::~Game()
 {
@@ -44,13 +40,6 @@ Game::~Game()
 }
 
 
-// Helper function to seed for random generation. If -1, seed is time(NULL)
-void Game::set_random_seed(const int seed)
-{
-    seed == -1 ? srand(time(NULL)) : srand(seed);
-}
-
-
 /*
  * Helper fuction to create the initial cells for the game.
  * Only callable if active game is set to false. Otherwise throws an error and exits
@@ -61,7 +50,6 @@ void Game::create_initial_cells()
     if(this->active_game)
     {
         printf("Error: create_initial_cells cannot be called when there is already an active game.\n");
-        //TODO: Cleanup before exit
         exit(-1);
     }
 
@@ -70,8 +58,8 @@ void Game::create_initial_cells()
         // Make a new cell that has unique coordinates
         while(true)
         {
-            int new_x = rand() % this->cols + 1;
-            int new_y = rand() % this->rows + 1;
+            int new_x = rand() % this->cols;
+            int new_y = rand() % this->rows;
 
             if(this->living_cells.find(std::make_pair(new_x, new_y)) == this->living_cells.end())
             {
@@ -191,7 +179,7 @@ void Game::play_round()
 }
 
 
-//TODO: This is a naive and very inefficient implementation. See about uing the living cell map to find new life
+//TODO: This is a naive and inefficient implementation. See about using the living cell map to find new life
 //  Helper function to loop through grid and find dead cells to make alive
 void Game::find_new_life()
 {
@@ -248,8 +236,6 @@ void Game::run_game()
     {
         for(int n = 0; n < this->max_iter; n++)
         {
-            printf("Playing round:\t%d\n", n);
-
             this->play_round();
         }
     }
@@ -257,6 +243,38 @@ void Game::run_game()
     {
         fprintf(stderr, "Error: Functionalty not yet implemented\n");
     }
+}
+
+
+// Function to return a Python list, to be used in Python module
+PyObject* Game::get_list()
+{
+    // Create a new 2-D list of size this->rows x this->cols
+    PyObject* cell_grid_list = PyList_New(0);
+    
+    for(int i = 0; i < this->cols; i++)
+    {
+        PyList_Append(cell_grid_list, PyList_New(0));
+    }
+
+    // Append the rows and initialize
+    for(int i = 0; i < this->cols; i++)
+    {
+        for(int j = 0; j < this->rows; j++)
+        {
+            if(this->living_cells.find(std::make_pair(i, j)) == this->living_cells.end())
+            {
+                PyList_Append(PyList_GET_ITEM(cell_grid_list, i), Py_False);
+            }
+            else
+            {
+                PyList_Append(PyList_GET_ITEM(cell_grid_list, i), Py_True);
+            }
+            
+        }
+    }
+
+    return cell_grid_list;
 }
 
 
