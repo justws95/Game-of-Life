@@ -14,15 +14,15 @@ class Game
 {
     private:
         bool limit_iter, active_game;
-        int rows, cols, max_iter;
-        int starting_cells;
+        int rows, cols, starting_cells, max_iter;
         std::map<std::pair<const int, const int>, Cell*> living_cells;
+        std::map<std::pair<const int, const int>, int> dead_candidates;
 
         void create_initial_cells(); 
         void update_cell_neighbors(Cell*);
         void create_live_cell(const int, const int);
         void kill_cell(std::map<std::pair<const int, const int>, Cell*>::iterator);
-        void find_new_life();
+        //void find_new_life();
 
         // FUNCTIONS TO REMOVE
         void print_cell_map(); // TODO: Delete after numpy integration successful

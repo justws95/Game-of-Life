@@ -53,6 +53,7 @@ void Game::create_initial_cells()
         exit(-1);
     }
 
+    // Create [starting_cells] number of unique,random cells and insert them
     for(int n = 0; n < this->starting_cells; n++)
     {
         // Make a new cell that has unique coordinates
@@ -138,36 +139,109 @@ void Game::create_live_cell(const int x, const int y)
     std::pair<std::pair<const int, const int>, Cell*> new_map_val = std::make_pair(coords, new_cell);
 
     this->living_cells.insert(new_map_val);
+
+    // Update the candidates map with the cells around the new live cell
+    for(int i = x - 1; i <= x + 1; i++)
+    {
+        if(i < 0 || i > this->cols)
+        {
+            continue;
+        }
+
+        for(int j = y - 1; j <= y + 1; j++)
+        {
+            std::pair<const int, const int> dead_cell = std::make_pair(i,j);
+
+            if(j < 0 || j > this->rows || this->living_cells.find(dead_cell) != this->living_cells.end())
+            {
+                continue;
+            }
+
+            // Reaching this point implies that location (i,j) is both valid and currently dead. Add to candidates
+            if(this->dead_candidates.find(dead_cell) == this->dead_candidates.end())
+            {
+                this->dead_candidates.insert(std::make_pair(dead_cell, 1));
+            }
+            else
+            {
+                ++this->dead_candidates.at(dead_cell);  
+            }
+        }
+    }
 }
 
 
 // Helper function to kill and delete a cell
 void Game::kill_cell(std::map<std::pair<const int, const int>, Cell*>::iterator it)
 {
+    std::pair<const int, const int> x_y_pos = it->first;
+
     this->living_cells.erase(it);
 
     delete it->second;
+
+    // Remove or decrement the neighbors of the cell from the dead_candidates map
+    for(int i = x_y_pos.first - 1; i <= x_y_pos.first + 1; i++)
+    {
+        if(i < 0 || i > this->cols)
+        {
+            continue;
+        }
+
+        for(int j = x_y_pos.second - 1; j <= x_y_pos.second + 1; j++)
+        {
+            std::pair<const int, const int> dead_cell = std::make_pair(i,j);
+
+            if(j < 0 || j > this->rows || this->living_cells.find(dead_cell) != this->living_cells.end())
+            {
+                continue;
+            }
+
+            // If the cell is in fact dead, decrement or remove from candidates map if only 1 neighbor
+            if(this->dead_candidates.find(dead_cell) != this->dead_candidates.end()) //TODO: Think about why this is needed
+            {
+                if(this->dead_candidates.at(dead_cell) == 1) // TODO: Check exception behavior
+                {
+                    this->dead_candidates.erase(dead_cell);
+                }
+                else
+                {
+                    --this->dead_candidates.at(dead_cell);
+                }
+            }
+        }
+    }
+    
 }
 
 
 // Function to run a single round of the game of life, according to the rules that Conway proposed
 void Game::play_round()
 {
-    std::map<std::pair<const int, const int>, Cell*>::iterator it;
-    std::vector<std::map<std::pair<const int, const int>, Cell*>::iterator> cells_to_kill;
-
     // Kill cells from under/over population
-    for(it = this->living_cells.begin(); it != this->living_cells.end(); it++)
+    std::map<std::pair<const int, const int>, Cell*>::iterator kill_it;
+    std::vector<std::map<std::pair<const int, const int>, Cell*>::iterator> cells_to_kill;
+    
+    for(kill_it = this->living_cells.begin(); kill_it != this->living_cells.end(); kill_it++)
     {
-        if(it->second->num_neighbors < 2 || it->second->num_neighbors > 3)
+        if(kill_it->second->num_neighbors < 2 || kill_it->second->num_neighbors > 3)
         {
-            cells_to_kill.push_back(it);
+            cells_to_kill.push_back(kill_it);
         }
     }
 
     // Create live cells from dead cells with 3 live neighbors
-    this->find_new_life();
+    std::map<std::pair<const int, const int>, int>::iterator make_it;
+    std::vector<std::pair<const int, const int>> cells_to_make;
 
+    for(make_it = this->dead_candidates.begin(); make_it != this->dead_candidates.end(); make_it++)
+    {
+        if(make_it->second == 3)
+        {
+            cells_to_make.push_back(make_it->first);
+        }
+    }
+    
     // Kill all the cells in the vector to be killed
     for(int n = 0; n < cells_to_kill.size(); n++)
     {
@@ -176,7 +250,23 @@ void Game::play_round()
 
     cells_to_kill.clear();
 
+    // Make all cells in vector of cells to be created
+    for(int n = 0; n < cells_to_make.size(); n++)
+    {
+        this->create_live_cell(cells_to_make.at(n).first, cells_to_make.at(n).second);
+    }
+
+    // Remove the newly made cells from the dead candidates map
+    for(int n = 0; n < cells_to_make.size(); n++)
+    {
+        this->dead_candidates.erase(cells_to_make.at(n));
+    }
+
+    cells_to_make.clear();
+
     // Update the neighbors for each cell
+    std::map<std::pair<const int, const int>, Cell*>::iterator it;
+
     for(it = this->living_cells.begin(); it != this->living_cells.end(); it++)
     {
         // Update the cells neighbors
@@ -184,7 +274,7 @@ void Game::play_round()
     }
 }
 
-
+/*
 //TODO: This is a naive and inefficient implementation. See about using the living cell map to find new life
 //  Helper function to loop through grid and find dead cells to make alive
 void Game::find_new_life()
@@ -233,6 +323,7 @@ void Game::find_new_life()
         }
     }
 }
+*/
 
 
 // Function to return a Python list, to be used in Python module
