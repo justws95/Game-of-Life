@@ -31,7 +31,7 @@ class Game
         Game(const int, const int, const int, const int max_iter = -1, const int random_seed = -1);
         ~Game();
         void play_round();
-        PyObject* get_list();
+        PyObject* get_cell_grid();
         void print_game_info();
 };
 

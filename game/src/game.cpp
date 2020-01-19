@@ -16,6 +16,23 @@ Game::Game(const int rows, const int cols, const int starting_cells, const int m
     // Set the random seed if specified
     random_seed == -1 ? srand(time(NULL)) : srand(random_seed);
 
+    // Create a new 2-D Python list object that will be accessed from Python
+    this->cell_grid = PyList_New(0);
+    
+    for(int i = 0; i < this->cols; i++)
+    {
+        PyList_Append(this->cell_grid, PyList_New(0));
+    }
+
+    for(int i = 0; i < this->cols; i++)
+    {
+        for(int j = 0; j < this->rows; j++)
+        {
+            PyList_Append(PyList_GET_ITEM(this->cell_grid, i), Py_False);
+            
+        }
+    }
+
     // Create initial cells at random    
     this->create_initial_cells();
 }
@@ -152,7 +169,7 @@ void Game::create_live_cell(const int x, const int y)
         {
             std::pair<const int, const int> dead_cell = std::make_pair(i,j);
 
-            if(j < 0 || j > this->rows || this->living_cells.find(dead_cell) != this->living_cells.end())
+            if(j < 0 || j > this->rows || (i == x && j == y) || this->living_cells.find(dead_cell) != this->living_cells.end())
             {
                 continue;
             }
@@ -167,6 +184,13 @@ void Game::create_live_cell(const int x, const int y)
                 ++this->dead_candidates.at(dead_cell);  
             }
         }
+    }
+
+    // Update the postion in the cell grid. Raise error and exit on failure to set.
+    if(PyList_SetItem(PyList_GET_ITEM(this->cell_grid, x), y, Py_True) == -1)
+    {
+        fprintf(stderr, "ERROR: Unable to set list index at postion (%d,%d)....terminating\n", x, y);
+        exit(-1);
     }
 }
 
@@ -210,6 +234,13 @@ void Game::kill_cell(std::map<std::pair<const int, const int>, Cell*>::iterator 
                 }
             }
         }
+    }
+
+    // Update the postion in the cell grid. Raise error and exit on failure to set.
+    if(PyList_SetItem(PyList_GET_ITEM(this->cell_grid, x_y_pos.first), x_y_pos.second, Py_False) == -1)
+    {
+        fprintf(stderr, "ERROR: Unable to set list index at postion (%d,%d)....terminating\n", x_y_pos.first, x_y_pos.second);
+        exit(-1);
     }
     
 }
@@ -275,35 +306,10 @@ void Game::play_round()
 }
 
 
-// Function to return a Python list, to be used in Python module
-PyObject* Game::get_list()
+// Getter for the cell grid Python list object
+PyObject* Game::get_cell_grid()
 {
-    // Create a new 2-D list of size this->rows x this->cols
-    PyObject* cell_grid_list = PyList_New(0);
-    
-    for(int i = 0; i < this->cols; i++)
-    {
-        PyList_Append(cell_grid_list, PyList_New(0));
-    }
-
-    // Append the rows and initialize
-    for(int i = 0; i < this->cols; i++)
-    {
-        for(int j = 0; j < this->rows; j++)
-        {
-            if(this->living_cells.find(std::make_pair(i, j)) == this->living_cells.end())
-            {
-                PyList_Append(PyList_GET_ITEM(cell_grid_list, i), Py_False);
-            }
-            else
-            {
-                PyList_Append(PyList_GET_ITEM(cell_grid_list, i), Py_True);
-            }
-            
-        }
-    }
-
-    return cell_grid_list;
+    return this->cell_grid;
 }
 
 
@@ -326,7 +332,7 @@ void Game::print_cell_map()
 }
 
 
-// Helper to print out lass info
+// Helper to print out class info
 void Game::print_game_info()
 {
     printf("----GAME INFO----\n");
