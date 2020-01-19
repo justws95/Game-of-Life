@@ -15,6 +15,7 @@ class Game
     private:
         bool limit_iter, active_game;
         int rows, cols, starting_cells, max_iter;
+        PyObject* cell_grid;
         std::map<std::pair<const int, const int>, Cell*> living_cells;
         std::map<std::pair<const int, const int>, int> dead_candidates;
 
@@ -22,7 +23,6 @@ class Game
         void update_cell_neighbors(Cell*);
         void create_live_cell(const int, const int);
         void kill_cell(std::map<std::pair<const int, const int>, Cell*>::iterator);
-        //void find_new_life();
 
         // FUNCTIONS TO REMOVE
         void print_cell_map(); // TODO: Delete after numpy integration successful

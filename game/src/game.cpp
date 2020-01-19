@@ -274,57 +274,6 @@ void Game::play_round()
     }
 }
 
-/*
-//TODO: This is a naive and inefficient implementation. See about using the living cell map to find new life
-//  Helper function to loop through grid and find dead cells to make alive
-void Game::find_new_life()
-{
-    // Loop through every cell loctaion
-    for(int i = 0; i < this->rows; i++)
-    {
-        for(int j = 0; j < this->cols; j++)
-        {
-            // See if the cell is alive. If so, continue
-            if(this->living_cells.find(std::make_pair(i, j)) != this->living_cells.end())
-            {
-                continue;
-            }
-
-            int num_living_neighbors = 0;
-
-            for(int x = i - 1; x <= i + 1; x++)
-            {
-                // Continue if the location is out of bounds
-                if(x < 0 || x >= this->rows)
-                {
-                    continue;
-                }
-
-                for(int y = j - 1; y <= j + 1; y++)
-                {
-                    // Continue if the location is out of bounds
-                    if(y < 0 || y >= this->cols)
-                    {
-                        continue;
-                    }
-
-                    if(this->living_cells.find(std::make_pair(x,y)) != this->living_cells.end())
-                    {
-                        ++num_living_neighbors;
-                    }
-                }
-            }
-
-            // If a dead cell has 3 living neighbors, bring it to life
-            if(num_living_neighbors == 3)
-            {
-                this->create_live_cell(i, j);
-            }
-        }
-    }
-}
-*/
-
 
 // Function to return a Python list, to be used in Python module
 PyObject* Game::get_list()
