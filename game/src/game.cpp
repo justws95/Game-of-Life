@@ -160,7 +160,7 @@ void Game::create_live_cell(const int x, const int y)
     // Update the candidates map with the cells around the new live cell
     for(int i = x - 1; i <= x + 1; i++)
     {
-        if(i < 0 || i > this->cols)
+        if(i < 0 || i >= this->cols)
         {
             continue;
         }
@@ -169,7 +169,7 @@ void Game::create_live_cell(const int x, const int y)
         {
             std::pair<const int, const int> dead_cell = std::make_pair(i,j);
 
-            if(j < 0 || j > this->rows || (i == x && j == y) || this->living_cells.find(dead_cell) != this->living_cells.end())
+            if(j < 0 || j >= this->rows || (i == x && j == y) || this->living_cells.find(dead_cell) != this->living_cells.end())
             {
                 continue;
             }
@@ -207,7 +207,7 @@ void Game::kill_cell(std::map<std::pair<const int, const int>, Cell*>::iterator 
     // Remove or decrement the neighbors of the cell from the dead_candidates map
     for(int i = x_y_pos.first - 1; i <= x_y_pos.first + 1; i++)
     {
-        if(i < 0 || i > this->cols)
+        if(i < 0 || i >= this->cols)
         {
             continue;
         }
@@ -216,7 +216,8 @@ void Game::kill_cell(std::map<std::pair<const int, const int>, Cell*>::iterator 
         {
             std::pair<const int, const int> dead_cell = std::make_pair(i,j);
 
-            if(j < 0 || j > this->rows || this->living_cells.find(dead_cell) != this->living_cells.end())
+            if(j < 0 || j >= this->rows || (i == x_y_pos.first && j == x_y_pos.second) 
+                || this->living_cells.find(dead_cell) != this->living_cells.end())
             {
                 continue;
             }
@@ -236,13 +237,16 @@ void Game::kill_cell(std::map<std::pair<const int, const int>, Cell*>::iterator 
         }
     }
 
+    // TODO: See why SetItem causes invalid pointer but SET_ITEM does not
     // Update the postion in the cell grid. Raise error and exit on failure to set.
+    PyList_SET_ITEM(PyList_GET_ITEM(this->cell_grid, x_y_pos.first), x_y_pos.second, Py_False);
+    /*
     if(PyList_SetItem(PyList_GET_ITEM(this->cell_grid, x_y_pos.first), x_y_pos.second, Py_False) == -1)
     {
         fprintf(stderr, "ERROR: Unable to set list index at postion (%d,%d)....terminating\n", x_y_pos.first, x_y_pos.second);
         exit(-1);
     }
-    
+    */
 }
 
 
@@ -274,7 +278,7 @@ void Game::play_round()
     }
     
     // Kill all the cells in the vector to be killed
-    for(int n = 0; n < cells_to_kill.size(); n++)
+    for(long unsigned int n = 0; n < cells_to_kill.size(); n++)
     {
         this->kill_cell(cells_to_kill[n]);
     }
@@ -282,13 +286,13 @@ void Game::play_round()
     cells_to_kill.clear();
 
     // Make all cells in vector of cells to be created
-    for(int n = 0; n < cells_to_make.size(); n++)
+    for(long unsigned int n = 0; n < cells_to_make.size(); n++)
     {
         this->create_live_cell(cells_to_make.at(n).first, cells_to_make.at(n).second);
     }
 
     // Remove the newly made cells from the dead candidates map
-    for(int n = 0; n < cells_to_make.size(); n++)
+    for(long unsigned int n = 0; n < cells_to_make.size(); n++)
     {
         this->dead_candidates.erase(cells_to_make.at(n));
     }
@@ -309,7 +313,7 @@ void Game::play_round()
 // Getter for the cell grid Python list object
 PyObject* Game::get_cell_grid()
 {
-    return this->cell_grid;
+    return PyList_AsTuple(this->cell_grid);
 }
 
 
