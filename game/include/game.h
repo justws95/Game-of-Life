@@ -33,6 +33,10 @@ class Game
         void play_round();
         PyObject* get_cell_grid();
         void print_game_info();
+
+        // FUNCTIONS TO DELETE
+        void print_candidates();
+        void print_living_cells();
 };
 
 #endif

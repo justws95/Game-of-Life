@@ -3625,6 +3625,48 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_Game_print_candidates(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  Game *arg1 = (Game *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:Game_print_candidates",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Game, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Game_print_candidates" "', argument " "1"" of type '" "Game *""'"); 
+  }
+  arg1 = reinterpret_cast< Game * >(argp1);
+  (arg1)->print_candidates();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Game_print_living_cells(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  Game *arg1 = (Game *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:Game_print_living_cells",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Game, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Game_print_living_cells" "', argument " "1"" of type '" "Game *""'"); 
+  }
+  arg1 = reinterpret_cast< Game * >(argp1);
+  (arg1)->print_living_cells();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *Game_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_ParseTuple(args,(char *)"O:swigregister", &obj)) return NULL;
@@ -3639,6 +3681,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "Game_play_round", _wrap_Game_play_round, METH_VARARGS, NULL},
 	 { "Game_get_cell_grid", _wrap_Game_get_cell_grid, METH_VARARGS, NULL},
 	 { "Game_print_game_info", _wrap_Game_print_game_info, METH_VARARGS, NULL},
+	 { "Game_print_candidates", _wrap_Game_print_candidates, METH_VARARGS, NULL},
+	 { "Game_print_living_cells", _wrap_Game_print_living_cells, METH_VARARGS, NULL},
 	 { "Game_swigregister", Game_swigregister, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
 };

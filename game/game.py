@@ -119,6 +119,12 @@ class Game(_object):
 
     def print_game_info(self):
         return _game.Game_print_game_info(self)
+
+    def print_candidates(self):
+        return _game.Game_print_candidates(self)
+
+    def print_living_cells(self):
+        return _game.Game_print_living_cells(self)
 Game_swigregister = _game.Game_swigregister
 Game_swigregister(Game)
 

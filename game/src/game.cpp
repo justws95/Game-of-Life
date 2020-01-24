@@ -63,10 +63,10 @@ Game::~Game()
  */ 
 void Game::create_initial_cells()
 {
-    //TODO: Evaluate necessity of check and of class member
+    //TODO: Evaluate necessity of active_game as class member
     if(this->active_game)
     {
-        printf("Error: create_initial_cells cannot be called when there is already an active game.\n");
+        fprintf(stderr, "Error: create_initial_cells cannot be called when there is already an active game.\n");
         exit(-1);
     }
 
@@ -120,14 +120,14 @@ void Game::update_cell_neighbors(Cell* cell)
     for(int i = x_pos - 1; i <= x_pos + 1; i++)
     {
         // Break out when less than 0, since this cannot happen with mapping schema
-        if(i < 0)
+        if(i < 0 || i >= this->cols)
         {
             continue;
         }
 
         for(int j = y_pos - 1; j <= y_pos + 1; j++)
         {
-            if((i == x_pos && j == y_pos) || y_pos < 0)
+            if((i == x_pos && j == y_pos) || j < 0 || j >= this->rows)
             {
                 continue;
             }
@@ -151,11 +151,21 @@ void Game::create_live_cell(const int x, const int y)
 {
     Cell* new_cell = new Cell(x, y);
 
-    // Insert the newly created cell into our living cell map, keyed on the cells position
-    std::pair<const int, const int> coords = std::make_pair(x,y);
-    std::pair<std::pair<const int, const int>, Cell*> new_map_val = std::make_pair(coords, new_cell);
+    // Insert the newly created cell into the living cell map, keyed on the cells position
+    this->living_cells.insert(std::make_pair(std::make_pair(x, y), new_cell));
 
-    this->living_cells.insert(new_map_val);
+    // Update the postion in the cell grid. Raise error and exit on failure to set.
+    if(PyList_SetItem(PyList_GET_ITEM(this->cell_grid, x), y, Py_True) == -1)
+    {
+        fprintf(stderr, "ERROR: Unable to set list index at postion (%d,%d)....terminating\n", x, y);
+        exit(-1);
+    }
+
+    // If this cell was a dead candidate cell, remove it
+    if(this->dead_candidates.find(std::make_pair(x, y)) != this->dead_candidates.end())
+    {
+        this->dead_candidates.erase(std::make_pair(x, y));
+    }
 
     // Update the candidates map with the cells around the new live cell
     for(int i = x - 1; i <= x + 1; i++)
@@ -167,75 +177,38 @@ void Game::create_live_cell(const int x, const int y)
 
         for(int j = y - 1; j <= y + 1; j++)
         {
-            std::pair<const int, const int> dead_cell = std::make_pair(i,j);
+            std::pair<const int, const int> test_cell = std::make_pair(i,j);
 
-            if(j < 0 || j >= this->rows || (i == x && j == y) || this->living_cells.find(dead_cell) != this->living_cells.end())
+            if(j < 0 || j >= this->rows || (i == x && j == y) || this->living_cells.find(test_cell) != this->living_cells.end())
             {
                 continue;
             }
 
             // Reaching this point implies that location (i,j) is both valid and currently dead. Add to candidates
-            if(this->dead_candidates.find(dead_cell) == this->dead_candidates.end())
+            if(this->dead_candidates.find(test_cell) == this->dead_candidates.end())
             {
-                this->dead_candidates.insert(std::make_pair(dead_cell, 1));
+                this->dead_candidates.insert(std::make_pair(test_cell, 1));
             }
             else
             {
-                ++this->dead_candidates.at(dead_cell);  
+                ++this->dead_candidates.at(test_cell);  
             }
         }
     }
 
-    // Update the postion in the cell grid. Raise error and exit on failure to set.
-    if(PyList_SetItem(PyList_GET_ITEM(this->cell_grid, x), y, Py_True) == -1)
-    {
-        fprintf(stderr, "ERROR: Unable to set list index at postion (%d,%d)....terminating\n", x, y);
-        exit(-1);
-    }
+
 }
 
 
 // Helper function to kill and delete a cell
 void Game::kill_cell(std::map<std::pair<const int, const int>, Cell*>::iterator it)
 {
+    // Remove the cell from living_cells and delete the Cell*
     std::pair<const int, const int> x_y_pos = it->first;
 
     this->living_cells.erase(it);
 
     delete it->second;
-
-    // Remove or decrement the neighbors of the cell from the dead_candidates map
-    for(int i = x_y_pos.first - 1; i <= x_y_pos.first + 1; i++)
-    {
-        if(i < 0 || i >= this->cols)
-        {
-            continue;
-        }
-
-        for(int j = x_y_pos.second - 1; j <= x_y_pos.second + 1; j++)
-        {
-            std::pair<const int, const int> dead_cell = std::make_pair(i,j);
-
-            if(j < 0 || j >= this->rows || (i == x_y_pos.first && j == x_y_pos.second) 
-                || this->living_cells.find(dead_cell) != this->living_cells.end())
-            {
-                continue;
-            }
-
-            // If the cell is in fact dead, decrement or remove from candidates map if only 1 neighbor
-            if(this->dead_candidates.find(dead_cell) != this->dead_candidates.end()) //TODO: Think about why this is needed
-            {
-                if(this->dead_candidates.at(dead_cell) == 1) // TODO: Check exception behavior
-                {
-                    this->dead_candidates.erase(dead_cell);
-                }
-                else
-                {
-                    --this->dead_candidates.at(dead_cell);
-                }
-            }
-        }
-    }
 
     // TODO: See why SetItem causes invalid pointer but SET_ITEM does not
     // Update the postion in the cell grid. Raise error and exit on failure to set.
@@ -247,6 +220,74 @@ void Game::kill_cell(std::map<std::pair<const int, const int>, Cell*>::iterator 
         exit(-1);
     }
     */
+
+    // Remove or decrement the neighbors of the cell from the dead_candidates map
+    for(int i = x_y_pos.first - 1; i <= x_y_pos.first + 1; i++)
+    {
+        if(i < 0 || i >= this->cols)
+        {
+            continue;
+        }
+
+        for(int j = x_y_pos.second - 1; j <= x_y_pos.second + 1; j++)
+        {
+            std::pair<const int, const int> test_cell = std::make_pair(i, j);
+            
+            if(j < 0 || j >= this->rows || (i == x_y_pos.first && j == x_y_pos.second) 
+                || this->living_cells.find(test_cell) != this->living_cells.end())
+            {
+                continue;
+            }
+
+            // If the cell is in fact dead, decrement or remove from candidates map if only 1 neighbor
+            if(this->dead_candidates.find(test_cell) != this->dead_candidates.end()) //TODO: Think about why this is needed
+            {
+                if(this->dead_candidates.at(test_cell) == 1) // TODO: Check exception behavior
+                {
+                    this->dead_candidates.erase(test_cell);
+                }
+                else
+                {
+                    --this->dead_candidates.at(test_cell);
+                }
+            }
+        }
+    }
+
+    // See if the newly killed cell has any neighbors and add to dead_candidates as necessary
+    for(int i = x_y_pos.first - 1; i <= x_y_pos.first + 1; i++)
+    {
+        if(i < 0 || i >= this->cols)
+        {
+            continue;
+        }
+
+        for(int j = x_y_pos.second - 1; j <= x_y_pos.second + 1; j++)
+        {
+            if(j < 0 || j >= this->rows || (i == x_y_pos.first && j == x_y_pos.second))
+            {
+                continue;
+            }
+
+            std::pair<const int, const int> test_cell = std::make_pair(i, j);
+
+            // If at a valid location, check if there is an alive cell. Update candidate info as necessary
+            if(this->living_cells.find(test_cell) != this->living_cells.end())
+            {
+                std::pair<const int, const int> dead_cell = std::make_pair(x_y_pos.first, x_y_pos.second);
+
+                if(this->dead_candidates.find(dead_cell) == this->dead_candidates.end())
+                {
+                    this->dead_candidates.insert(std::make_pair(dead_cell, 1));
+                }
+                else
+                {
+                    ++this->dead_candidates.at(dead_cell);
+                }
+                
+            }
+        }
+    }
 }
 
 
@@ -288,14 +329,17 @@ void Game::play_round()
     // Make all cells in vector of cells to be created
     for(long unsigned int n = 0; n < cells_to_make.size(); n++)
     {
-        this->create_live_cell(cells_to_make.at(n).first, cells_to_make.at(n).second);
+        this->create_live_cell(cells_to_make[n].first, cells_to_make[n].second);
     }
 
+    /*
+    // TODO: Delete this code block as it is redundant, kill_cell already erases from dead_candidates
     // Remove the newly made cells from the dead candidates map
     for(long unsigned int n = 0; n < cells_to_make.size(); n++)
     {
-        this->dead_candidates.erase(cells_to_make.at(n));
+        this->dead_candidates.erase(cells_to_make[n]);
     }
+    */
 
     cells_to_make.clear();
 
@@ -347,7 +391,32 @@ void Game::print_game_info()
     printf("Alive Cells:\t%lu\n", this->living_cells.size());
     printf("Max Iteration:\t%d\n", this->max_iter);
     printf("Starting cells:\t%d\n", this->starting_cells);
-
     printf("\n\n---------- Cell Map at Current State ----------\n\n");
     this->print_cell_map();
+}
+
+
+//TODO: Delete everything below this line
+void Game::print_candidates()
+{
+    std::map<std::pair<const int, const int>, int>::iterator it;
+
+    printf("ROUND DEAD CANDIDATES\n\n");
+
+    for(it = this->dead_candidates.begin(); it != this->dead_candidates.end(); it++)
+    {
+        printf("\tDead cell (%d,%d) has %d living neighbors\n", it->first.first, it->first.second, it->second);
+    }
+}
+
+void Game::print_living_cells()
+{
+    std::map<std::pair<const int, const int>, Cell*>::iterator it;
+
+    printf("ROUND LIVING CELLLS\n\n");
+
+    for(it = this->living_cells.begin(); it != this->living_cells.end(); it++)
+    {
+        printf("\tLiving cell at location (%d,%d) has %d neighbors\n", it->first.first, it->first.second, it->second->num_neighbors);
+    }
 }

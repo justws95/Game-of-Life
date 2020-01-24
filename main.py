@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation 
 from game import game
 
+#ROUND = 0 #TODO: Delete after testing
 
 def get_array(Game):
     array = Game.get_cell_grid()
@@ -15,6 +16,17 @@ def get_array(Game):
 
 def update(frameNum, img, ax, Game): 
     Game.play_round()
+    
+    """
+    global ROUND #TODO: Delete these lines after testing
+    print("---------------------------")
+    print("Concluded round: ", ROUND)
+    ROUND += 1
+    Game.print_living_cells()
+    Game.print_candidates()
+    """
+    
+
     grid = get_array(Game)
 
     img = ax.imshow(grid, interpolation='nearest') 
@@ -23,9 +35,9 @@ def update(frameNum, img, ax, Game):
 
 
 def main():
-    ROWS = 100
-    COLS = 100
-    START = 10000
+    ROWS = 50
+    COLS = 10
+    START = 333
     ITER = -1
     SEED = -1
 
@@ -36,16 +48,34 @@ def main():
     # Instantiate a game
     Game = game.Game(ROWS, COLS, START, ITER, SEED)
 
+    """
+    print("Game Initial State") #TODO: Delete these 3 lines
+    Game.print_living_cells()
+    Game.print_candidates()
+
+    # TODO: Delete after testing
+    round = 0
+
+    while round < 10:
+        Game.play_round()
+        print("---------------------------")
+        print("Concluded round: ", round)
+        Game.print_living_cells()
+        Game.print_candidates()
+        round += 1
+    """
+
     # Grid of cells to be plotted
     grid = get_array(Game)
 
     # set up animation 
     fig, ax = plt.subplots() 
     img = ax.imshow(grid, interpolation='nearest') 
-    ani = animation.FuncAnimation(fig, update, fargs=(img, ax, Game, ), frames=30) 
+    ani = animation.FuncAnimation(fig, update, fargs=(img, ax, Game, ), frames=15) 
 
     plt.title("Conway's Game of Life")
     plt.show()
+    
 
   
 # call main 
