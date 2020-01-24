@@ -35,11 +35,11 @@ def update(frameNum, img, ax, Game):
 
 
 def main():
-    ROWS = 50
-    COLS = 50
-    START = 300
+    ROWS = 75
+    COLS = 40
+    START = 400
     ITER = -1
-    SEED = -1
+    SEED = 42
 
     if(START > (ROWS * COLS)):
         print("ERROR: The number of starting cells exceeds possible maximum value")
