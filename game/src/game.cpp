@@ -239,17 +239,13 @@ void Game::kill_cell(std::map<std::pair<const int, const int>, Cell*>::iterator 
                 continue;
             }
 
-            // If the cell is in fact dead, decrement or remove from candidates map if only 1 neighbor
-            if(this->dead_candidates.find(test_cell) != this->dead_candidates.end()) //TODO: Think about why this is needed
+            if(this->dead_candidates.at(test_cell) == 1)
             {
-                if(this->dead_candidates.at(test_cell) == 1) // TODO: Check exception behavior
-                {
-                    this->dead_candidates.erase(test_cell);
-                }
-                else
-                {
-                    --this->dead_candidates.at(test_cell);
-                }
+                this->dead_candidates.erase(test_cell);
+            }
+            else
+            {
+                --this->dead_candidates.at(test_cell);
             }
         }
     }
