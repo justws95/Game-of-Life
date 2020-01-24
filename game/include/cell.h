@@ -14,6 +14,7 @@ class Cell
         friend class Game; //TODO: Evaluate if single function in game can be friended to modify cells
     
     public:
+        bool operator==(Cell&);
         const int get_x_pos();
         const int get_y_pos();
         const std::pair<const int, const int> get_pos_pair();

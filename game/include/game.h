@@ -24,7 +24,7 @@ class Game
         void create_live_cell(const int, const int);
         void kill_cell(std::map<std::pair<const int, const int>, Cell*>::iterator);
 
-        // FUNCTIONS TO REMOVE
+        // FUNCTIONS TO REMOVE AFTER TESTING
         void print_cell_map(); // TODO: Delete after numpy integration successful
 
     public:
@@ -32,9 +32,9 @@ class Game
         ~Game();
         void play_round();
         PyObject* get_cell_grid();
-        void print_game_info();
+        void print_game_info(); // TODO: Evaluate if this function should be kept or modified
 
-        // FUNCTIONS TO DELETE
+        // FUNCTIONS TO REMOVE AFTER TESTING
         void print_candidates();
         void print_living_cells();
 };

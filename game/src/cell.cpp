@@ -9,6 +9,13 @@ Cell::Cell(const int x, const int y)
 }
 
 
+// Overloaded equivalancey relational operator
+bool Cell::operator==(Cell &cell)
+{
+    return (this->x_pos == cell.get_x_pos() ? this->y_pos == cell.get_y_pos() : false);
+}
+
+
 // Getter for x position
 const int Cell::get_x_pos()
 {

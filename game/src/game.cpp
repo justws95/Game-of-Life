@@ -10,10 +10,8 @@ Game::Game(const int rows, const int cols, const int starting_cells, const int m
     this->max_iter = max_iter;
     this->active_game = false;
 
-    // Set iteration limit if specified
+    // Set iteration limit if specified and random seed if specified
     max_iter == -1 ? this->limit_iter = false : this->limit_iter = true;
-
-    // Set the random seed if specified
     random_seed == -1 ? srand(time(NULL)) : srand(random_seed);
 
     // Create a new 2-D Python list object that will be accessed from Python
@@ -33,7 +31,7 @@ Game::Game(const int rows, const int cols, const int starting_cells, const int m
         }
     }
 
-    // Create initial cells at random    
+    // Create initial random cells 
     this->create_initial_cells();
 }
 
@@ -73,7 +71,6 @@ void Game::create_initial_cells()
     // Create [starting_cells] number of unique,random cells and insert them
     for(int n = 0; n < this->starting_cells; n++)
     {
-        // Make a new cell that has unique coordinates
         while(true)
         {
             int new_x = rand() % this->cols;
@@ -84,25 +81,17 @@ void Game::create_initial_cells()
                 this->create_live_cell(new_x, new_y);
                 break;
             }
-            else
-            {
-                continue;
-            }
-            
         }
     }
-
 
     // Set the game session to active and update number of living cells
     this->active_game = true;
 
-    // Create a cell map iterator
+    // Update the neighbors for each cell
     std::map<std::pair<const int, const int>, Cell*>::iterator it;
 
-    // Update the neighbors for each cell
     for(it = this->living_cells.begin(); it != this->living_cells.end(); it++)
     {
-        // Update the cells neighbors
         this->update_cell_neighbors(it->second);
     }
 }
@@ -119,7 +108,6 @@ void Game::update_cell_neighbors(Cell* cell)
 
     for(int i = x_pos - 1; i <= x_pos + 1; i++)
     {
-        // Break out when less than 0, since this cannot happen with mapping schema
         if(i < 0 || i >= this->cols)
         {
             continue;
@@ -133,12 +121,9 @@ void Game::update_cell_neighbors(Cell* cell)
             }
             else
             {
-                // Check the map of living cells for the existence of the neighbor
-                std::pair<const int, const int> test_coords = std::make_pair((const int) i, (const int) j);
-
-                if(this->living_cells.find(test_coords) != this->living_cells.end())
+                if(this->living_cells.find(std::make_pair((const int)i, (const int)j)) != this->living_cells.end())
                 {
-                    cell->num_neighbors++;
+                    ++cell->num_neighbors;
                 }
             }
         }
@@ -184,7 +169,6 @@ void Game::create_live_cell(const int x, const int y)
                 continue;
             }
 
-            // Reaching this point implies that location (i,j) is both valid and currently dead. Add to candidates
             if(this->dead_candidates.find(test_cell) == this->dead_candidates.end())
             {
                 this->dead_candidates.insert(std::make_pair(test_cell, 1));
@@ -265,10 +249,8 @@ void Game::kill_cell(std::map<std::pair<const int, const int>, Cell*>::iterator 
                 continue;
             }
 
-            std::pair<const int, const int> test_cell = std::make_pair(i, j);
-
             // If at a valid location, check if there is an alive cell. Update candidate info as necessary
-            if(this->living_cells.find(test_cell) != this->living_cells.end())
+            if(this->living_cells.find(std::make_pair(i, j)) != this->living_cells.end())
             {
                 std::pair<const int, const int> dead_cell = std::make_pair(x_y_pos.first, x_y_pos.second);
 
@@ -314,7 +296,7 @@ void Game::play_round()
         }
     }
     
-    // Kill all the cells in the vector to be killed
+    // Kill/create all the cell changes from the round
     for(long unsigned int n = 0; n < cells_to_kill.size(); n++)
     {
         this->kill_cell(cells_to_kill[n]);
@@ -322,20 +304,10 @@ void Game::play_round()
 
     cells_to_kill.clear();
 
-    // Make all cells in vector of cells to be created
     for(long unsigned int n = 0; n < cells_to_make.size(); n++)
     {
         this->create_live_cell(cells_to_make[n].first, cells_to_make[n].second);
     }
-
-    /*
-    // TODO: Delete this code block as it is redundant, kill_cell already erases from dead_candidates
-    // Remove the newly made cells from the dead candidates map
-    for(long unsigned int n = 0; n < cells_to_make.size(); n++)
-    {
-        this->dead_candidates.erase(cells_to_make[n]);
-    }
-    */
 
     cells_to_make.clear();
 
@@ -344,7 +316,6 @@ void Game::play_round()
 
     for(it = this->living_cells.begin(); it != this->living_cells.end(); it++)
     {
-        // Update the cells neighbors
         this->update_cell_neighbors(it->second);
     }
 }
@@ -360,7 +331,6 @@ PyObject* Game::get_cell_grid()
 // Heper function to print the cell map
 void Game::print_cell_map()
 {
-    // Create a cell map iterator
     std::map<std::pair<const int, const int>, Cell*>::iterator it;
 
     for(int i = 0; i < this->cols; i++)
@@ -392,7 +362,7 @@ void Game::print_game_info()
 }
 
 
-//TODO: Delete everything below this line
+//TODO: Delete everything below this line after testing
 void Game::print_candidates()
 {
     std::map<std::pair<const int, const int>, int>::iterator it;
