@@ -36,8 +36,8 @@ def update(frameNum, img, ax, Game):
 
 def main():
     ROWS = 50
-    COLS = 10
-    START = 333
+    COLS = 50
+    START = 300
     ITER = -1
     SEED = -1
 
