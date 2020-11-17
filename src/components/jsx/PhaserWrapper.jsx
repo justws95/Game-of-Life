@@ -28,8 +28,8 @@ class PhaserWrapper extends Component {
   state = {
     initialize: true,
     game: {
-      width: "100%",
-      height: "100%",
+      width: "75%",
+      height: "75%",
       type: Phaser.AUTO,
       scene: {
         init: function() {

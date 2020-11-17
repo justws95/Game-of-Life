@@ -7,7 +7,7 @@ function GameMenu() {
   const [activeItem, setActive] = useState('GAME');
 
   return (
-    <Menu tabular>
+    <Menu tabular color='teal' inverted>
       <Menu.Item
         as={Link}
         to="/"
