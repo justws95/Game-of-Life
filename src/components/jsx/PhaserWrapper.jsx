@@ -33,9 +33,12 @@ class PhaserWrapper extends Component {
       type: Phaser.AUTO,
       scene: {
         init: function() {
-          this.cameras.main.setBackgroundColor('#24252A')
+          this.startingCells = 0;
+          this.livingCells = this.startingCells;
+          this.currentIteration = 0;
         },
         create: function() {
+          /*
           this.helloWorld = this.add.text(
             this.cameras.main.centerX, 
             this.cameras.main.centerY, 
@@ -45,6 +48,8 @@ class PhaserWrapper extends Component {
             }
           );
           this.helloWorld.setOrigin(0.5);
+          */
+         
         },
         update: function() {
           this.helloWorld.angle += 1;
