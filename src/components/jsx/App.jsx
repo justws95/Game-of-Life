@@ -2,9 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import AppMenu from './AppMenu';
-import PhaserWrapper from './PhaserWrapper';
 import AboutPage from './AboutPage';
-
+import PhaserGame from './PhaserGame';
 
 //import '../css/App.css';
 
@@ -14,7 +13,15 @@ function App() {
     <Router>
       <AppMenu />
       <Switch>
-        <Route exact path="/" component={ PhaserWrapper } />
+        <Route exact path="/">
+          <PhaserGame
+            gameRows={10} 
+            gameCols={10} 
+            startingCells={20} 
+            width={800} 
+            height={600} 
+          />
+        </Route> 
         <Route path="/about" component={ AboutPage } />
       </Switch>
     </Router>
