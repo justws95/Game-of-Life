@@ -120,10 +120,10 @@ let drawCells = (graphics, rows, cols, cellGrid, cellWidth, cellHeight) => {
       if (cellGrid[i][j] === 1) {
         graphics.fillStyle(0x05f7a7, 1);
         graphics.fillRect(
-          (i * cellWidth), 
-          (j * cellHeight), 
-          cellWidth - 2, 
-          cellHeight - 2
+          (i * cellWidth + 1), 
+          (j * cellHeight + 1), 
+          (cellWidth - 2), 
+          (cellHeight - 2)
         );
       }
     }
@@ -147,7 +147,7 @@ gameScene.init = function() {
   this.gameBoxHeight = 720;
   this.cellWidth = (this.gameBoxWidth / this.cols);
   this.cellHeight = (this.gameBoxHeight / this.rows);
-  this.startingCells = Math.floor(this.rows * this.cols * 0.5);
+  this.startingCells = Math.floor(this.rows * this.cols * 0.25);
   this.livingCells = this.startingCells;
   this.iteration = 0;
   this.cellGrid = getInitialGrid(this.rows, this.cols, this.startingCells);
