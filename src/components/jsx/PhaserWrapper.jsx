@@ -4,7 +4,7 @@ import { IonPhaser } from '@ion-phaser/react';
 import game from '../../phaser/game';
 
 
-function PhaserWrapper() {
+function PhaserWrapper(props) {
 	return (
 		<React.Fragment>
 			<IonPhaser game={game} initialize={false} />
