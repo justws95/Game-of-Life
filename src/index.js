@@ -32,9 +32,6 @@ let countNeighbors = (x, y, cellGrid, rows, cols) => {
   let temp_x = 0;
   let temp_y = 0;
 
-  console.log("------------------------------------------");
-  console.log("Testing neighbors for cell at position: (", x, ",", y, ").");
-
   // Count the number of neighbors for a cell, wrapping the container in both axes
   for (let i = x - 1; i <= x + 1; i++) {
     for (let j = y - 1; j <= y + 1; j++) {
@@ -58,8 +55,6 @@ let countNeighbors = (x, y, cellGrid, rows, cols) => {
       else if (j >= cols) {
         temp_y = 0 + (j - cols);
       }
-
-      console.log("The value at (", temp_x, ", ", temp_y, ") was: ", cellGrid[temp_x][temp_y]);
 
       if (cellGrid[temp_x][temp_y] === 1) {
         ++numNeighbors;
@@ -86,31 +81,24 @@ let playRound = (oldGrid, rows, cols) => {
     
       let neighbors = countNeighbors(x_index, y_index, oldGrid, rows, cols);
 
-      console.log("The number of neighbors for this cell was: ", neighbors);
-
+      
       switch(oldGrid[x_index][y_index] === 1) {
         case true:
-          console.log("This cell is currently alive");
           if (neighbors === 2 || neighbors === 3) {
-            console.log("Setting this position to ALIVE next round");
             newGrid[x_index][y_index] = 1;
             ++newCellNum;
           }
           else {
-            console.log("Setting this position to DEAD next round");
             newGrid[x_index][y_index] = 0;
           }
 
           break;
         case false:
-          console.log("This cell is currently dead");
           if (neighbors === 3) {
-            console.log("Setting this position to ALIVE next round");
             newGrid[x_index][y_index] = 1;
             ++newCellNum;
           }
           else {
-            console.log("Setting this position to DEAD next round");
             newGrid[x_index][y_index] = 0;
           }
 
@@ -153,18 +141,18 @@ let config = {
 };
 
 gameScene.init = function() {
-  this.rows = 80;
-  this.cols = 80;
+  this.rows = 150;
+  this.cols = 150;
   this.gameBoxWidth = 1200;
   this.gameBoxHeight = 720;
   this.cellWidth = (this.gameBoxWidth / this.cols);
   this.cellHeight = (this.gameBoxHeight / this.rows);
-  this.startingCells = Math.floor(this.rows * this.cols * 0.10);
+  this.startingCells = Math.floor(this.rows * this.cols * 0.5);
   this.livingCells = this.startingCells;
   this.iteration = 0;
   this.cellGrid = getInitialGrid(this.rows, this.cols, this.startingCells);
   this.timerTick = 0;
-  this.updateFreq = 60; // Update once per second
+  this.updateFreq = 1; // Update once per second
   this.graphics = null;
 }
 
@@ -194,15 +182,12 @@ gameScene.create = function() {
 gameScene.update = function() {
   ++this.timerTick;
   
-  //if (this.timerTick >=  this.updateFreq && this.timerTick % this.updateFreq === 0) {
-  if (true) {
-    console.log("Playing round: ", this.iteration);
+  if (this.timerTick >=  this.updateFreq && this.timerTick % this.updateFreq === 0) {
     [this.cellGrid, this.livingCells] = playRound(this.cellGrid, this.rows, this.cols);
     //throw new Error("Something went badly wrong!");
     this.graphics.clear();
     drawCells(this.graphics, this.rows, this.cols, this.cellGrid, this.cellWidth, this.cellHeight);
     ++this.iteration;
-    console.log("The number of living cells is: ", this.livingCells);
   }
 }
 
