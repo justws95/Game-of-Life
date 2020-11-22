@@ -2,9 +2,10 @@ import React, { useState } from 'react'
 import Phaser from 'phaser'
 import { IonPhaser } from '@ion-phaser/react'
 
-import playGame from '../../phaser/scene';
+//import playGame from '../../phaser/scene';
+import game from '../../phaser/scene';
 
-
+/*
 const config = {
 	type: Phaser.AUTO,
 	parent: "phaser",
@@ -13,7 +14,7 @@ const config = {
 	scene: playGame
 };
   
-const game = new Phaser.Game(config);
+//const game = new Phaser.Game(config);
 
 function PhaserWrapper() {
 	const [initialize, setInitilize] = useState(true);
@@ -23,6 +24,13 @@ function PhaserWrapper() {
 			<IonPhaser game={game} initialize={initialize} />
 		</React.Fragment>
 	);
+}
+*/
+
+function PhaserWrapper() {
+	<React.Fragment>
+		<IonPhaser game={game} initialize={initialize} />
+	</React.Fragment>
 }
 
 export default PhaserWrapper;
