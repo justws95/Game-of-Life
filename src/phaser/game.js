@@ -130,73 +130,67 @@ let drawCells = (graphics, rows, cols, cellGrid, cellWidth, cellHeight) => {
   }  
 }
 
+function getConfig() {
+  let gameScene = new Phaser.Scene('Game');
 
-let gameScene = new Phaser.Scene('Game');
+  let gameConfig = {
+    type: Phaser.AUTO,
+    width: 1200,
+    height: 720,
+    scene: gameScene
+  };
 
-let config = {
-  type: Phaser.AUTO,
-  width: 1200,
-  height: 720,
-  scene: gameScene
-};
-
-gameScene.init = function() {
-  this.rows = 100;
-  this.cols = 100;
-  this.gameBoxWidth = 1200;
-  this.gameBoxHeight = 720;
-  this.cellWidth = (this.gameBoxWidth / this.cols);
-  this.cellHeight = (this.gameBoxHeight / this.rows);
-  this.startingCells = Math.floor(this.rows * this.cols * 0.25);
-  this.livingCells = this.startingCells;
-  this.iteration = 0;
-  this.cellGrid = getInitialGrid(this.rows, this.cols, this.startingCells);
-  this.timerTick = 0;
-  this.updateFreq = 30; // Update once per second
-  this.graphics = null;
-}
-
-
-gameScene.preload = function() {
-}
-
-
-gameScene.create = function() {
-  // Create the playing grid
-  this.add.grid(
-    0,
-    0,
-    this.gameBoxWidth, 
-    this.gameBoxHeight,
-    this.cellWidth,
-    this.cellHeight,
-    0x646464
-  ).setOrigin(0,0);
-
-  // Draw the initial cells
-  this.graphics = this.add.graphics();
-  drawCells(this.graphics, this.rows, this.cols, this.cellGrid, this.cellWidth, this.cellHeight);
-}
-
-
-gameScene.update = function() {
-  ++this.timerTick;
-  
-  if (this.timerTick >=  this.updateFreq && this.timerTick % this.updateFreq === 0) {
-    [this.cellGrid, this.livingCells] = playRound(this.cellGrid, this.rows, this.cols);
-    //throw new Error("Something went badly wrong!");
-    this.graphics.clear();
-    drawCells(this.graphics, this.rows, this.cols, this.cellGrid, this.cellWidth, this.cellHeight);
-    ++this.iteration;
+  gameScene.init = function() {
+    this.rows = 100;
+    this.cols = 100;
+    this.gameBoxWidth = 1200;
+    this.gameBoxHeight = 720;
+    this.cellWidth = (this.gameBoxWidth / this.cols);
+    this.cellHeight = (this.gameBoxHeight / this.rows);
+    this.startingCells = Math.floor(this.rows * this.cols * 0.25);
+    this.livingCells = this.startingCells;
+    this.iteration = 0;
+    this.cellGrid = getInitialGrid(this.rows, this.cols, this.startingCells);
+    this.timerTick = 0;
+    this.updateFreq = 5;
+    this.graphics = null;
   }
+
+
+  gameScene.preload = function() {
+  }
+
+
+  gameScene.create = function() {
+    // Create the playing grid
+    this.add.grid(
+      0,
+      0,
+      this.gameBoxWidth, 
+      this.gameBoxHeight,
+      this.cellWidth,
+      this.cellHeight,
+      0x646464
+    ).setOrigin(0,0);
+
+    // Draw the initial cells
+    this.graphics = this.add.graphics();
+    drawCells(this.graphics, this.rows, this.cols, this.cellGrid, this.cellWidth, this.cellHeight);
+  }
+
+
+  gameScene.update = function() {
+    ++this.timerTick;
+    
+    if (this.timerTick >=  this.updateFreq && this.timerTick % this.updateFreq === 0) {
+      [this.cellGrid, this.livingCells] = playRound(this.cellGrid, this.rows, this.cols);
+      this.graphics.clear();
+      drawCells(this.graphics, this.rows, this.cols, this.cellGrid, this.cellWidth, this.cellHeight);
+      ++this.iteration;
+    }
+  }
+
+  return gameConfig;
 }
 
-
-gameScene.end = function() {
-  //TODO: Flesh out
-}
-
-
-const game = new Phaser.Game(config);
-
-export default game;
+export default getConfig;
