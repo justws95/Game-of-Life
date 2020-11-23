@@ -130,21 +130,21 @@ let drawCells = (graphics, rows, cols, cellGrid, cellWidth, cellHeight) => {
   }  
 }
 
-function getConfig() {
+function getConfig(gameWidth, gameHeight) {
   let gameScene = new Phaser.Scene('Game');
 
   let gameConfig = {
     type: Phaser.AUTO,
-    width: 1200,
-    height: 720,
+    width: gameWidth,
+    height: gameHeight,
     scene: gameScene
   };
 
   gameScene.init = function() {
     this.rows = 100;
     this.cols = 100;
-    this.gameBoxWidth = 1200;
-    this.gameBoxHeight = 720;
+    this.gameBoxWidth = gameWidth;
+    this.gameBoxHeight = gameHeight;
     this.cellWidth = (this.gameBoxWidth / this.cols);
     this.cellHeight = (this.gameBoxHeight / this.rows);
     this.startingCells = Math.floor(this.rows * this.cols * 0.25);

@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Phaser from "phaser";
 import { IonPhaser } from '@ion-phaser/react';
 
 import getConfig from '../../phaser/game';
+
+import '../css/PhaserWrapper.css';
 
 
 class PhaserWrapper extends React.Component {
 	constructor(props) {
 		super(props);
 		this.game = null;
-		this.gameConfig = getConfig();
+		this.gameConfig = getConfig(props.width, props.height);
 	}
 
 	componentDidMount() {
-		if (this.game === null) { 
-			console.log("Going to try to create a new game.");
-			console.log("I will use the following config: ", this.gameConfig);
+		if (this.game === null) {
 			this.game = new Phaser.Game(this.gameConfig);
 		}
 	}

@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import AppMenu from './AppMenu';
 import AboutPage from './AboutPage';
-import PhaserWrapper from './PhaserWrapper';
+import GamePage from './GamePage';
 
 //import '../css/App.css';
 
@@ -13,15 +13,7 @@ function App() {
     <Router>
       <AppMenu />
       <Switch>
-        <Route exact path="/">
-          <PhaserWrapper
-            gameRows={10} 
-            gameCols={10} 
-            startingCells={20} 
-            width={800} 
-            height={600} 
-          />
-        </Route> 
+        <Route exact path="/" component={ GamePage } />
         <Route path="/about" component={ AboutPage } />
       </Switch>
     </Router>
