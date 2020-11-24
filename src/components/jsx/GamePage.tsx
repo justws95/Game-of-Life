@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { IonPhaser, GameInstance } from '@ion-phaser/react';
-import { Grid, Menu, Dropdown, Header } from 'semantic-ui-react';
-import { ChromePicker } from 'react-color';
+import { Grid, Menu, Image, Container, Header, Button } from 'semantic-ui-react';
+import { SliderPicker } from 'react-color';
 
 import getConfig from '../../phaser/game';
 
-import logo from '../../assets/logo.png';
+import splashScreenGif from '../../assets/splash-screen.gif';
 
 
 const gameConfig: GameInstance = getConfig(900, 600);
@@ -15,11 +15,13 @@ function GamePage () {
   const [game, setGame] = useState<GameInstance>();
   const [initialize, setInitialize] = useState(false);
   const [disableInputs, setInputState] = useState(false);
+  const [backGroundColor, setBackColor] = useState('0x646464');
+  const [foreGroundColor, setForeColor] = useState('0x05f7a7');
 
   const destroy = () => {
     console.log('Instance', game?.instance)
-    setInitialize(false)
-    setGame(undefined)
+    setInitialize(false);
+    setGame(undefined);
   }
 
   useEffect(() => {
@@ -30,7 +32,7 @@ function GamePage () {
     else {
       setInputState(false);
     }
-  }, [initialize])
+  }, [initialize]);
 
   return (
     <Grid stretched>
@@ -44,11 +46,27 @@ function GamePage () {
               <p>This is also a menu item</p>
             </Menu.Item>
             <Menu.Item>
-              <ChromePicker />
+              <Header content="Grid Color" inverted/>
+              <SliderPicker 
+                color={backGroundColor}
+                onChangeComplete={ color => {
+                  setBackColor(color.hex);
+                }}
+              />
+            </Menu.Item>
+            <Menu.Item>
+              <Header content="Cell Color" inverted/>
+              <SliderPicker 
+                color={foreGroundColor}
+                onChangeComplete={ color => {
+                  setForeColor(color.hex);
+                  console.log("I'm gonna set the forGroundColor to: ", color.hex);
+                }}
+              />
             </Menu.Item>
           </Menu>
         </Grid.Column>
-        <Grid.Column stretched width={12}>
+        <Grid.Column stretched width={12} textAlign='center'>
           <div className="App">
             <header className="App-header">
               { initialize ? (
@@ -60,10 +78,10 @@ function GamePage () {
                 </React.Fragment>
               ) : (
                 <React.Fragment>
-                  <img src={logo} className="App-logo" alt="logo" />
-                  <div onClick={() => setInitialize(true)} className="flex">
-                    <a href="#1" className="bttn">Initialize</a>
-                  </div>
+                  <Container textAlign='justified'>
+                    <Image src={splashScreenGif} size='massive' bordered />
+                    <Button fluid content="Start Simulation" />
+                  </Container>
                 </React.Fragment>
               )}
             </header>
