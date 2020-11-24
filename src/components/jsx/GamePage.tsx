@@ -1,52 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { IonPhaser, GameInstance } from '@ion-phaser/react';
 import { Grid, Menu, Dropdown, Header } from 'semantic-ui-react';
 import { ChromePicker } from 'react-color';
 
-import PhaserWrapper from './PhaserWrapper';
+import getConfig from '../../phaser/game';
+
+import logo from '../../assets/logo.png';
 
 
-function GamePage(props) {
-  return (
-    <div className='game-page-container'>
-      <Menu
-        vertical
-        size='large'
-        className='game-page-menu'
-      >
-      <Menu.Item>
-        <Dropdown item text='Game Grid Size'>
-          <Dropdown.Menu>
-            <Dropdown.Item>Electronics</Dropdown.Item>
-            <Dropdown.Item>Automotive</Dropdown.Item>
-            <Dropdown.Item>Home</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-        </Menu.Item>
-        <br />
-        <br/>
-        <Menu.Item>
-          <Header content={"Grid Color"} />
-          <ChromePicker />
-        </Menu.Item>
-        <br />
-        <br />
-        <Menu.Item>
-          <Header content={"Cell Color"} />
-          <ChromePicker />
-        </Menu.Item>
-      </Menu>
-      <PhaserWrapper width={900} height={600} className='game-page-phaser-wrapper' />
-    </div>
-  );
-}
+const gameConfig: GameInstance = getConfig(900, 600);
 
-export default GamePage;
-/*
 
 function GamePage () {
-  const [game, setGame] = useState<GameInstance>()
-  const [initialize, setInitialize] = useState(false)
+  const [game, setGame] = useState<GameInstance>();
+  const [initialize, setInitialize] = useState(false);
+  const [disableInputs, setInputState] = useState(false);
 
   const destroy = () => {
     console.log('Instance', game?.instance)
@@ -56,7 +24,11 @@ function GamePage () {
 
   useEffect(() => {
     if (initialize) {
-      setGame(Object.assign({}, gameConfig))
+      setGame(Object.assign({}, gameConfig));
+      setInputState(true);
+    }
+    else {
+      setInputState(false);
     }
   }, [initialize])
 
@@ -65,11 +37,14 @@ function GamePage () {
       <Grid.Row stretched>
         <Grid.Column stretched width={3}>
           <Menu vertical inverted size='large'>
-            <Menu.Item>
+            <Menu.Item disabled={disableInputs}>
               <p>This is a menu item</p>
             </Menu.Item>
-            <Menu.Item>
+            <Menu.Item disabled={disableInputs}>
               <p>This is also a menu item</p>
+            </Menu.Item>
+            <Menu.Item>
+              <ChromePicker />
             </Menu.Item>
           </Menu>
         </Grid.Column>
@@ -77,19 +52,19 @@ function GamePage () {
           <div className="App">
             <header className="App-header">
               { initialize ? (
-                <>
+                <React.Fragment>
                   <IonPhaser game={game} initialize={initialize} />
                   <div onClick={destroy} className="flex destroyButton">
                     <a href="#1" className="bttn">Destroy</a>
                   </div>
-                </>
+                </React.Fragment>
               ) : (
-                <>
+                <React.Fragment>
                   <img src={logo} className="App-logo" alt="logo" />
                   <div onClick={() => setInitialize(true)} className="flex">
                     <a href="#1" className="bttn">Initialize</a>
                   </div>
-                </>
+                </React.Fragment>
               )}
             </header>
           </div>
@@ -100,4 +75,3 @@ function GamePage () {
 }
 
 export default GamePage;
-*/

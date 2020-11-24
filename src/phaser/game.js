@@ -137,6 +137,17 @@ function getConfig(gameWidth, gameHeight) {
     type: Phaser.AUTO,
     width: gameWidth,
     height: gameHeight,
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+      width: '100%',
+      height: '100%'
+    },
+    render: {
+      antialias: false,
+      pixelArt: true,
+      roundPixels: true
+    },
     scene: gameScene
   };
 
