@@ -80,7 +80,13 @@ function GamePage () {
                 <React.Fragment>
                   <Container textAlign='justified'>
                     <Image src={splashScreenGif} size='massive' bordered />
-                    <Button fluid content="Start Simulation" />
+                    <Button 
+                      fluid 
+                      content="Start Simulation"
+                      onClick={click => {
+                        setInitialize(true);
+                      }} 
+                    />
                   </Container>
                 </React.Fragment>
               )}
