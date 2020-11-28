@@ -157,7 +157,7 @@ function getConfig(gameWidth, gameHeight) {
     this.iteration = 0;
     this.cellGrid = getInitialGrid(this.rows, this.cols, this.startingCells);
     this.timerTick = 0;
-    this.updateFreq = 5;
+    this.updateFreq = 60;
     this.graphics = null;
   }
 
